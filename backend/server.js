@@ -1,9 +1,12 @@
+const mongoose = require('mongoose')
 const dotenv = require('dotenv')
 const express = require('express');
-
+const cors = require('cors');
 
 const app = express();
-app.use(express.json())
+
+
+mongoose.set('strictQuery', true);
 
 
 // Configuring the localhost PORT
@@ -15,6 +18,8 @@ const PORT = process.env.PORT;
 require('./db/conn.js')
 
 
+app.use(cors())
+app.use(express.json())
 // creating the middleware
 
 const middleware = (req, res, next) =>{
@@ -24,6 +29,9 @@ const middleware = (req, res, next) =>{
 
 
 // Routes
+app.use(require('./routes/auth'));
+
+
 
 app.get('/', (req, res) => {
     res.send("Welcome to Server!");
