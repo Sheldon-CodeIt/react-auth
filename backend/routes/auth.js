@@ -1,21 +1,24 @@
 const router = require("express").Router();
 let user = require("../models/user.model");
 
-router.route("/register").post((req, res) => {
+router.route("/register").post( async (req, res) => {
+
+
   const { name, email, phone, work, password, cpassword } = req.body;
 
   if (!name || !email || !phone || !work || !password || !cpassword) {
-    return res.staus(422).json({ error: "Please fill all the entries." });
+    return res.status(422).json({ error: "Please fill all the entries." });
   }
 
-  user
-    .findOne({ email: email })
-    .then((userExist) => {
-      if (userExist) {
-        return res.staus(422).json({ error: "Email already exists!" });
-      }
+  try {
+    
+    const userExist =  await user.findOne({ email: email });
+    if(userExist)
+    {
+        return res.status(422).json({ error: "Email already exists!" });
+    }
 
-      const newUser = new user({
+    const newUser = new user({
         name,
         email,
         phone,
@@ -23,14 +26,18 @@ router.route("/register").post((req, res) => {
         password,
         cpassword,
       });
-      newUser
-        .save()
-        .then(() => res.status(201).json("User registered successfully!"))
-        .catch((error) => res.status(500).json(error + "Error"));
-    })
-    .catch((err) => {
-      console.log(err);
-    });
+
+      await newUser.save()
+
+      res.status(201).json({message: "user registered successfully"});
+    
+  }
+  catch(error)
+  {
+    console.log(error);
+  }
+
+
 });
 
 module.exports = router;
